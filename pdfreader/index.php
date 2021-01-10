@@ -16,7 +16,7 @@ $password = "";
 
 $databaseName = "pdf_library";
 
-$ready_to_print = "";
+$ready_to_print[] = "";
 
 $connect = mysqli_connect($hostname, $username, $password);
 mysqli_select_db($connect, $databaseName);
@@ -27,15 +27,15 @@ $user_id = htmlspecialchars($_SESSION["id"]);
 //aYuDa
 //$result = mysqli_query($connect, $query);
 
-$stmt = $connect->prepare("SELECT book_name FROM books WHERE id IN (SELECT book_id FROM belongings WHERE user_id = " . $user_id . ");");
-//$stmt->bind_param('s', $username);
+$stmt = $connect->prepare("SELECT book_name FROM books WHERE id IN (SELECT bookid FROM belongings WHERE userid = $user_id);");
 $stmt->execute();
 $result = $stmt->get_result();
+
 foreach ($result as $row) {
     //print_r($row);
-    $ready_to_print .= $row['book_name'] . ' ,';
+    $ready_to_print[] .= $row['book_name'];
 }
-$ready_to_print = substr($ready_to_print, 0, -2) . ".";
+//$ready_to_print = substr($ready_to_print, 0, -2) . "."; 
 
 //while($row = mysqli_fetch_array($result))
 //{
@@ -43,8 +43,24 @@ $ready_to_print = substr($ready_to_print, 0, -2) . ".";
 //} 
 
 //$row = mysqli_fetch_row($result);
-
 mysqli_free_result($result);
+
+if (isset( $_REQUEST['submit'] ) ) {
+print ("aaa");
+$bname = $_REQUEST['bname'];
+$burl = $_REQUEST['burl'];
+
+$stmt = $connect->prepare("INSERT INTO books (book_name, book_url) VALUES ('$bname', '$burl');");
+$stmt->execute();
+
+$stmt = $connect->prepare("INSERT INTO belongings (bookid, userid) VALUES ((SELECT id FROM books WHERE book_name = '$bname'), '$user_id');");
+$stmt->execute();
+header("Location: index.php");
+print ("bbb");
+//$stmt = $connect->prepare("INSERT INTO belongings (bookid, userid) VALUES ((SELECT id FROM books WHERE book_name = '$bname'), '$user_id');");
+//$stmt->execute();
+print ("ccc");
+}
 
 mysqli_close($connect);
 ?>
@@ -63,7 +79,7 @@ mysqli_close($connect);
 <body>
     <h1>Welcome to Drive PDF Library</h1>
     <hr>
-    <b id="user">Username: <?php echo htmlspecialchars($_SESSION["username"]); ?><br>ID: <?php echo htmlspecialchars($_SESSION["id"]); ?></b><br>
+    <b id="user">Username: <?php echo htmlspecialchars($_SESSION["username"]); ?><br>ID: <?php echo $user_id; ?></b><br>
     <a href="reading.php">Start reading</a>
     <a href="logout.php" class="btn btn-danger">Sign Out</a>
     <hr>
@@ -74,7 +90,7 @@ mysqli_close($connect);
         <tr>
             <td id="scren">Tus libros: </td>
             <td>
-            <?php print ($ready_to_print);?>
+            <?php print_r ($ready_to_print);?>
             </td>
         </tr>
     </table>
@@ -82,20 +98,21 @@ mysqli_close($connect);
     <source src="sound/BGM_VICTOO.ogg" type="audio/ogg">
     Your browser does not support the audio element.
     </audio>
-    <table id="add_a_book">
-    <tr>
-    <td>Add a book!</td>
-    </tr>
-    <tr>
-    <td>Name: <input type="text"></td>
-    </tr>
-    <tr>
-    <td>URL: <input type="text"></td>
-    </tr>
-    <tr>
-    <td><button>Send</button></td>
-    </tr>
-    </table>
+    <br>
+    <form action="/pdfreader/index.php" method="request" id="registerbooks"><br><br>
+    <label for="bname">Book name:</label><br>
+    <input required type="text" name="bname" value=""><br><br>
+    <label for="burl">Book URL:</label><br>
+    <input required type="text" name="burl" value=""><br><br>
+    <input type="submit" value="submit" name="submit"><br><br>
+    </form>
+<table>
+    <?php 
+    echo $ready_to_print[1];
+    echo $ready_to_print[2];
+    echo $ready_to_print[3];
+?>
+</table>
 </body>
 <script type="text/javascript" src="js/query.js"></script>
 </html>

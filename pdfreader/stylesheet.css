@@ -55,3 +55,9 @@ div.wrapper{
     margin-right: auto;
     margin-top: 2px;
 }
+#registerbooks{
+    border: 2px solid #1E000E;
+    left:auto;
+    right:auto;
+    width:40%;
+}
