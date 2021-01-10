@@ -35,18 +35,24 @@ foreach ($result as $row) {
     //print_r($row);
     $ready_to_print[] .= $row['book_name'];
 }
-//$ready_to_print = substr($ready_to_print, 0, -2) . "."; 
 
-//while($row = mysqli_fetch_array($result))
-//{
-//print_r($row);
-//} 
+if (isset($_GET['nexturl'])){
+$_SESSION['nexturl'] = $_GET['nexturl'];
+}
 
-//$row = mysqli_fetch_row($result);
+
+if (isset($_GET['deletebook'])){
+    $book_delete_name = $_GET['delete_input'];
+    $stmt = $connect->prepare("DELETE FROM belongings WHERE bookid = (SELECT id FROM books WHERE book_name = '$book_delete_name');");
+    $stmt->execute();
+    $stmt = $connect->prepare("DELETE FROM books WHERE book_name = '$book_delete_name';");
+    $stmt->execute();
+    header("Location: index.php");
+    }
+
 mysqli_free_result($result);
 
 if (isset( $_REQUEST['submit'] ) ) {
-print ("aaa");
 $bname = $_REQUEST['bname'];
 $burl = $_REQUEST['burl'];
 
@@ -56,13 +62,9 @@ $stmt->execute();
 $stmt = $connect->prepare("INSERT INTO belongings (bookid, userid) VALUES ((SELECT id FROM books WHERE book_name = '$bname'), '$user_id');");
 $stmt->execute();
 header("Location: index.php");
-print ("bbb");
-//$stmt = $connect->prepare("INSERT INTO belongings (bookid, userid) VALUES ((SELECT id FROM books WHERE book_name = '$bname'), '$user_id');");
-//$stmt->execute();
-print ("ccc");
 }
 
-mysqli_close($connect);
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -88,9 +90,12 @@ mysqli_close($connect);
             <!--<td><button onclick="query_f()">Reload</button></td>-->
         </tr>
         <tr>
-            <td id="scren">Tus libros: </td>
+            <td id="scren">Your books: </td>
             <td>
-            <?php print_r ($ready_to_print);?>
+            <?php 
+    $implode_ready = implode (", " ,$ready_to_print);
+    print (substr($implode_ready,(strlen($implode_ready)*-1)+2));
+            ?>
             </td>
         </tr>
     </table>
@@ -99,20 +104,48 @@ mysqli_close($connect);
     Your browser does not support the audio element.
     </audio>
     <br>
-    <form action="/pdfreader/index.php" method="request" id="registerbooks"><br><br>
+    <div>
+    <form action="/pdfreader/index.php" method="request" id="registerbooks"><br>
+    <label>Insert your books</label><br><br>
     <label for="bname">Book name:</label><br>
-    <input required type="text" name="bname" value=""><br><br>
+    <input required pattern="[^' ']+" type="text" name="bname" value=""><br><br>
     <label for="burl">Book URL:</label><br>
     <input required type="text" name="burl" value=""><br><br>
     <input type="submit" value="submit" name="submit"><br><br>
     </form>
-<table>
-    <?php 
-    echo $ready_to_print[1];
-    echo $ready_to_print[2];
-    echo $ready_to_print[3];
-?>
-</table>
+    <br>
+    <?php
+    if(count($ready_to_print)>1){
+    foreach(array_slice($ready_to_print, 1) as $item)
+    {
+    $stmt = $connect->prepare("SELECT book_url FROM books WHERE book_name = '$item';");
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $get_url_to_print[]="";
+    foreach ($result as $row) {
+        //print_r($row);
+        $get_url_to_print = array();
+        $get_url_to_print[] = $row['book_url'];
+    }
+    echo '<br>';
+    echo '<div id="Library">';
+    echo '<form action="/pdfreader/index.php" method="GET"><br>';
+    echo "<label for='nexturl'>Book name: $item</label><br>";
+    echo "<input type='text' name='nexturl' value=" . implode ($get_url_to_print) ."><br>";
+    echo '<input type="submit" value="Load" name="nexturl_b"> ';
+    echo "<form action='/pdfreader/index.php' method='GET'><input type='text' name='delete_input' value='$item' style='display:none;'><input type='submit' value='Delete' name='deletebook'></form><br>";
+    echo '</form>';
+    echo '</div>';
+    echo '<br>';
+    }
+}
+    mysqli_close($connect);
+    ?>
+    
+</div>
+<div id="info_div">
+<a href="https://paypal.me/pools/c/8vWrgCsgSt" target="_blank">Donate :)</a> <a href="https://github.com/TortitasT/Drive-PDF-Library" target="_blank">GitHub</a>
+</div>
 </body>
 <script type="text/javascript" src="js/query.js"></script>
 </html>

@@ -32,10 +32,10 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
         <table>
             <tr>
                 <td>Drive share URL: </td>
-                <td><input id="prompt" type="text"></td>
+                <td><input id="prompt" type="text" value="<?php print $_SESSION['nexturl']; ?>"></td>
                 <td><button onclick="update_f()">Load</button></td>
             </tr>
-        <!-- <tr>
+         <!--<tr>
                 <td>Click if error</td>
                 <td><button onclick="editUrl()">Edit</button></td>
             </tr> -->
