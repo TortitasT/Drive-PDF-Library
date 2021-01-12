@@ -7,4 +7,4 @@ For setting it up I just put the source code of the folder pdflibrary into the A
 Then to setup the database (which is needed because the website uses a login sistem) import the database found in pdf_library_sql.rar.
 Have fun!
 
-Website domain comming up :D
+Website domain: http://drivepdflibrary.xyz
