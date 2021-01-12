@@ -8,18 +8,12 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     exit;
 }
 
-$hostname = "208.97.163.222";
-
-$username = "tortitaspdf";
-
-$password = "pdflibrary";
-
-$databaseName = "pdflibrary";
+include_once("config.php");
 
 $ready_to_print[] = "";
 
-$connect = mysqli_connect($hostname, $username, $password);
-mysqli_select_db($connect, $databaseName);
+$connect = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD);
+mysqli_select_db($connect, DB_NAME);
 
 $user_id = htmlspecialchars($_SESSION["id"]);
 

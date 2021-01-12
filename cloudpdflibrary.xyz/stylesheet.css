@@ -47,7 +47,7 @@ div.wrapper{
     width:250px;
 }
 #add_a_book{
-    position: absolute;
+    position: fixed;
     bottom:0px;
     left:0px;
     width: 100%;
@@ -57,7 +57,7 @@ div.wrapper{
 }
 #registerbooks{
     border: 2px solid #1E000E;
-    width:15%;
+    width: 20%;
     height:20%;
     display: inline-block;
     margin-left: auto;
@@ -73,7 +73,7 @@ div.form
 
 #Library {
     border: 2px solid #1E000E;
-    width:15%;
+    width: 20%;
     display: inline-block;
     margin-left: auto;
     margin-right: auto;

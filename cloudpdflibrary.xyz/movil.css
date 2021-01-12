@@ -37,6 +37,14 @@ menu{
 }
 
 menu input{
-    height:30%;
-    width:30%;
+    height:5%;
+    width:5%;
+}
+
+#login_form{
+    width:100%;
+}
+
+#register_form{
+    width:100%;
 }
